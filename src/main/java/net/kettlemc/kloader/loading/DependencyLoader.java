@@ -17,6 +17,7 @@ public class DependencyLoader {
                         .artifactId("jaskl-hocon")
                         .groupId("io{}github{}almighty-satan{}jaskl")
                         .version("1.4.1")
+                        .isolatedLoad(false)
                         .resolveTransitiveDependencies(true)
                         .build()
         );
@@ -36,12 +37,13 @@ public class DependencyLoader {
     }
 
     private static Library buildWithVersion(String toParse) {
-        String[] parts = toParse.replace(".", "{}").split(":");
+        String[] parts = toParse.split(":");
         try {
             Library.Builder builder = Library.builder()
-                    .groupId(parts[0])
+                    .groupId(parts[0].replace(".", "{}"))
                     .artifactId(parts[1])
                     .version(parts[2])
+                    .isolatedLoad(false)
                     .resolveTransitiveDependencies(true);
             LoadingConfiguration.EXCLUDE.getValue().forEach(exclude -> {
                 String[] excludeParts = split(exclude);
