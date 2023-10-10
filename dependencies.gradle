@@ -3,4 +3,7 @@ dependencies {
 
     // Use "implementation" for dependencies that are not shaded into the final jar
     // Use "internal" for dependencies that are shaded into the final jar
+
+    implementation "com.alessiodp.libby:libby-bukkit:2.0.0-SNAPSHOT"
+
 }

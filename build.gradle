@@ -3,6 +3,7 @@
 
 plugins {
     id "java"
+    id "com.github.johnrengelman.shadow" version "7.0.0"
 }
 
 
@@ -27,6 +28,7 @@ jar {
     from {
         configurations.internal.collect { it.isDirectory() ? it : zipTree(it) }
     }
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 compileJava { options.encoding = "UTF-8" }
@@ -101,7 +103,7 @@ dependencies {
 }
 
 if (jasklVersion && jasklImplementation) {
-    if (jasklShadow) {
+    if (jasklShadow == "true") {
         dependencies {
             internal "io.github.almighty-satan.jaskl:jaskl-${jasklImplementation}:${jasklVersion}"
         }
@@ -113,7 +115,7 @@ if (jasklVersion && jasklImplementation) {
 }
 
 if (slamsVersion && (slamsParser || slamsImplementation) ) {
-    if (slamsShadow) {
+    if (slamsShadow == "true") {
         dependencies {
             internal "io.github.almighty-satan.slams:slams-parser-${slamsParser}:${slamsVersion}"
             internal "io.github.almighty-satan.slams:slams-${slamsImplementation}:${slamsVersion}"
@@ -130,6 +132,14 @@ if (klanguageVersion) {
     dependencies {
         implementation "net.kettlemc.klanguage:klanguage-core:${klanguageVersion}"
         implementation "net.kettlemc.klanguage:klanguage-${klanguageImplementation}:${klanguageVersion}"
+        implementation 'net.kyori:adventure-text-minimessage:4.14.0'
+        implementation 'net.kyori:adventure-platform-bukkit:4.3.0'
+    }
+}
+
+if (kcommonVersion) {
+    dependencies {
+        implementation "net.kettlemc:kcommon:${kcommonVersion}"
     }
 }
 
@@ -147,7 +157,7 @@ processResources {
     outputs.upToDateWhen { false }
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
     from sourceSets.main.resources.srcDirs
-    include "**/plugin.yml"
+    include "**/*.*"
     expand(
             "name": pluginName,
             "version": pluginVersion,
@@ -161,4 +171,30 @@ processResources {
 
 static JavaVersion getVersionForMajor(String version) {
     return JavaVersion.values().find { (it.majorVersion == version) }
+}
+
+if (libby == "true") {
+
+    repositories {
+        maven {
+            name = "AlessioDP"
+            url = "https://repo.alessiodp.com/releases/"
+        }
+    }
+
+    dependencies {
+        implementation "com.alessiodp.libby:libby-bukkit:2.0.0-SNAPSHOT"
+    }
+
+    shadowJar {
+        // Add dependencies you want to relocate here if needed
+        dependencies {
+            include dependency("com.alessiodp.libby:libby-bukkit:2.0.0-SNAPSHOT")
+            include dependency("com.alessiodp.libby:libby-core:2.0.0-SNAPSHOT")
+            print("Libby is enabled")
+        }
+
+        // Configure relocations
+        relocate 'com.alessiodp.libby', "net.kettlemc.${pluginName}.libs.com.alessiodp.libby"
+    }
 }

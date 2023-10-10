@@ -5,3 +5,4 @@ author: ${author}
 description: ${description}
 api-version: ${apiversion}
 website: ${website}
+load: STARTUP
