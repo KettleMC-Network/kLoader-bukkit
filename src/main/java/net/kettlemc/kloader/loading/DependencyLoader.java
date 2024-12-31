@@ -3,9 +3,11 @@ package net.kettlemc.kloader.loading;
 import com.alessiodp.libby.BukkitLibraryManager;
 import com.alessiodp.libby.Library;
 import com.alessiodp.libby.LibraryManager;
+import net.kettlemc.kloader.KLoader;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Objects;
+import java.util.logging.Level;
 
 public class DependencyLoader {
 
@@ -31,7 +33,13 @@ public class DependencyLoader {
         manager.addSonatype();
 
         LoadingConfiguration.REPOSITORIES.getValue().forEach(manager::addRepository);
-        LoadingConfiguration.DEPENDENCIES.getValue().stream().map(DependencyLoader::buildWithVersion).filter(Objects::nonNull).forEach(manager::loadLibrary);
+        LoadingConfiguration.DEPENDENCIES.getValue().stream().map(DependencyLoader::buildWithVersion).filter(Objects::nonNull).forEach(library -> {
+            try {
+                manager.loadLibrary(library);
+            } catch (Exception e) {
+                KLoader.instance().plugin().getLogger().log(Level.SEVERE, "Failed to load library: " + library.getArtifactId(), e);
+            }
+        });
 
         manager.loadLibraries();
     }

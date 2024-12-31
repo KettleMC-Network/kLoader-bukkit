@@ -11,9 +11,12 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public final class KLoader implements Loadable {
 
+    private static KLoader instance;
+
     private final JavaPlugin plugin;
 
     public KLoader(JavaPlugin plugin) {
+        instance = this;
         this.plugin = plugin;
     }
 
@@ -29,9 +32,16 @@ public final class KLoader implements Loadable {
         DependencyLoader.load(plugin);
     }
 
+    public static KLoader instance() {
+        return instance;
+    }
+
     @Override
     public void onDisable() {
         LoadingConfiguration.unload();
     }
 
+    public JavaPlugin plugin() {
+        return this.plugin;
+    }
 }
